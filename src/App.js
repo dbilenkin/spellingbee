@@ -2,18 +2,24 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import spellingBeeWords from './spellingBeeWords';
 import Rankings from './Rankings';
+import RankingsModal from './RankingsModal/RankingsModal';
 import GuessedWords from './GuessedWords/GuessedWords';
 import { isPangram } from './utilities';
+import Answers from './Answers/Answers';
 
 function App() {
   const [special, setSpecial] = useState("");
   const [letters, setLetters] = useState([]);
   const [words, setWords] = useState([]);
+  const [rankings, setRankings] = useState([]);
 
   const [guess, setGuess] = useState("");
   const [guessedWords, setGuessedWords] = useState([]);
   const [alert, setAlert] = useState("");
   const [score, setScore] = useState(0);
+
+  const [showRankings, setShowRankings] = useState(false);
+  const [showAnswers, setShowAnswers] = useState(false);
 
   useEffect(() => {
     if (localStorage.special) {
@@ -24,40 +30,50 @@ function App() {
   }, []);
 
   function initNewGame() {
-    const spellingBeeKeys = Object.keys(spellingBeeWords);
-    const index = Math.floor(Math.random() * spellingBeeKeys.length);
-    const spellingBeeKey = spellingBeeKeys[index];
 
-    const _special = spellingBeeKey.split("-")[0];
-    const _letters = spellingBeeKey.split("-")[1].split("").filter(letter => letter !== _special);
-    const _words = spellingBeeWords[spellingBeeKey];
+    let gameId = parseInt(window.location.pathname.split("/")[2]);
+    if (!gameId) {
+      gameId = Math.floor(Math.random() * spellingBeeWords.length);
+      window.history.replaceState(null, "", "/spellingbee/" + gameId);
+    }
+
+    const game = spellingBeeWords[gameId];
+
+    const _special = game.special;
+    const _letters = game.letters.split("").filter(letter => letter !== _special);
+    const _words = game.words;
+    const _rankings = game.rankings;
 
     setSpecial(_special);
     setLetters(_letters);
     setWords(_words);
+    setRankings(_rankings);
 
     setScore(0);
     setGuess("");
     setGuessedWords([]);
     setAlert("");
 
-    saveToStorage(_special, _letters, _words);
+    saveToStorage(_special, _letters, _words, _rankings);
   }
 
   function getFromStorage() {
     setSpecial(localStorage.special);
     setLetters(JSON.parse(localStorage.letters));
     setWords(JSON.parse(localStorage.words));
+    setRankings(JSON.parse(localStorage.rankings));
     setScore(parseInt(localStorage.score));
+
     if (localStorage.guessedWords) {
       setGuessedWords(JSON.parse(localStorage.guessedWords));
     }
   }
 
-  function saveToStorage(special, letters, words) {
+  function saveToStorage(special, letters, words, rankings) {
     localStorage.special = special;
     localStorage.letters = JSON.stringify(letters);
     localStorage.words = JSON.stringify(words);
+    localStorage.rankings = JSON.stringify(rankings);
   }
 
   function newGame() {
@@ -65,6 +81,7 @@ function App() {
     localStorage.removeItem("letters");
     localStorage.removeItem("words");
     localStorage.removeItem("guessedWords");
+    localStorage.removeItem("score");
 
     initNewGame();
   }
@@ -76,7 +93,9 @@ function App() {
 
   function renderGuess() {
     return guess.split("").map((letter, i) => (
-      letter.toLowerCase() === special ? <span key={i} className='specialLetter'>{letter}</span> : <span key={i}>{letter}</span>
+      letter.toLowerCase() === special ?
+        <span key={i} className='specialLetter'>{letter}</span> :
+        <span key={i} className=''>{letter}</span>
     ))
   }
 
@@ -129,9 +148,9 @@ function App() {
           setAlert("Pangram! +" + scoreForWord);
         } else {
           setAlert("Awesome! +" + scoreForWord);
-        } 
+        }
       }
-      
+
 
       newGuessedWords.unshift(formatGuess(guess));
       setGuessedWords(newGuessedWords);
@@ -151,12 +170,16 @@ function App() {
         <div className='ml-3'>Spelling Bee</div>
         <div className='flex'>
           <div className='cursor-pointer text-base mr-3' onClick={newGame}>New Game</div>
-          <div className='text-base mr-3'>Rankings</div>
+          <div className='cursor-pointer text-base mr-3' onClick={() => setShowRankings(true)}>Rankings</div>
+          <div className='cursor-pointer text-base mr-3' onClick={() => setShowAnswers(true)}>Answers</div>
+
         </div>
       </header>
       <div className='content'>
-        <Rankings score={score} words={words} letters={letters}/>
-        <GuessedWords guessedWords={guessedWords} />
+        <RankingsModal score={score} rankings={rankings} showRankings={showRankings} setShowRankings={setShowRankings} />
+        <Answers guessedWords={guessedWords} words={words} special={special} letters={letters} showAnswers={showAnswers} setShowAnswers={setShowAnswers} />
+        <Rankings score={score} rankings={rankings} />
+        <GuessedWords guessedWords={guessedWords} letters={letters} />
         <div className={`rounded justify-self-center h-8 py-1 px-2 mt-[60px] bg-black text-white alert ${alert ? 'show' : ''} ${alert.indexOf('!') !== -1 ? 'nice' : ''}`}>{alert}</div>
         <div className="guess">{renderGuess()}</div>
         <div className="letters">
@@ -166,15 +189,15 @@ function App() {
           ))}
         </div>
         <div className='buttons'>
-          <button className="btn w-[90px]" onClick={deleteLetter}>
+          <button className="btn w-[90px] h-[50px]" onClick={deleteLetter}>
             Delete
           </button>
           <button className="btn refreshButton" onClick={shuffle}>
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
             </svg>
           </button>
-          <button className="btn w-[90px]" onClick={enterGuess}>
+          <button className="btn w-[90px] h-[50px]" onClick={enterGuess}>
             Enter
           </button>
         </div>

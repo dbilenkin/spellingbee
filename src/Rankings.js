@@ -1,70 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { isPangram } from './utilities';
+import { levels } from './utilities';
 
-const levels = [
-    {
-        percentage: 0,
-        label: "Beginner"
-    },
-    {
-        percentage: 2,
-        label: "Good Start"
-    },
-    {
-        percentage: 5,
-        label: "Moving Up"
-    },
-    {
-        percentage: 8,
-        label: "Good"
-    },
-    {
-        percentage: 15,
-        label: "Solid"
-    },
-    {
-        percentage: 25,
-        label: "Nice"
-    },
-    {
-        percentage: 40,
-        label: "Great"
-    },
-    {
-        percentage: 50,
-        label: "Amazing"
-    },
-    {
-        percentage: 70,
-        label: "Genius"
-    },
-    {
-        percentage: 100,
-        label: "Queen Bee"
-    }
-];
+function Rankings({ score, rankings }) {
 
-function Rankings({ score, words, letters }) {
-
-    const [rankings, setRankings] = useState([]);
-    const [maxScore, setMaxScore] = useState(0);
     const [ranking, setRanking] = useState("Beginner");
     const [rankingIndex, setRankingIndex] = useState(0);
 
     useEffect(() => {
-        const _maxScore = words.reduce((prev, word) => {
-            let score = word.length === 4 ? 1 : word.length;
-            score += isPangram(word, letters) ? 7 : 0;
-            return prev + score;
-        }, 0);
-        const _rankings = levels.map(level => Math.ceil(level.percentage * _maxScore / 100));
-
-        setMaxScore(_maxScore);
-        setRankings(_rankings);
-    }, [words]);
-
-    useEffect(() => {
         let _ranking;
+        const maxScore = rankings[rankings.length - 1];
         for (let i = 0; i < levels.length; i++) {
             if (score < levels[i].percentage * maxScore / 100) {
                 break;
@@ -73,17 +17,21 @@ function Rankings({ score, words, letters }) {
             setRankingIndex(i);
         }
         setRanking(_ranking);
-    }, [score, maxScore]);
+    }, [score, rankings]);
 
     function getRankingBall(i) {
         if (i === 8) {
-            return <div className='bg-yellow-400 w-8 h-8 text-xs text-center leading-8'>
-                {rankingIndex === 8 ? score : ''}
-            </div>
+            return rankingIndex === 8 ? <div className='bg-yellow-400 w-8 h-8 text-xs text-center leading-8'>
+                {score}
+            </div> : <div className='bg-gray-300 w-[8px] h-[8px]'></div>
+        } else if (i === rankingIndex) {
+            return <div className='rounded-full bg-yellow-400 w-8 h-8 text-xs text-center leading-8'>{score}</div>
+        } else if (i < rankingIndex) {
+            return <div className='rounded-full bg-yellow-400 w-[8px] h-[8px]'></div>
+        } else {
+            return <div className='rounded-full bg-gray-300 w-[8px] h-[8px]'></div>
         }
-        return i === rankingIndex ?
-            <div className='rounded-full bg-yellow-400 w-8 h-8 text-xs text-center leading-8'>{score}</div> :
-            <div className='rounded-full bg-yellow-400 w-[5px] h-[5px]'></div>
+            
     }
 
     return (

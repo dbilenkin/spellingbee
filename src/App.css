@@ -4,12 +4,11 @@
 
 .App-header {
   display: flex;
-  background-color: #282c34;
   height: 40px;
   align-items: center;
   justify-content: space-between;
   font-size: 20px;
-  color: white;
+  border-bottom: solid 1px #e5e7eb;
 }
 
 .content {
@@ -33,7 +32,6 @@
   content: "";
   position: relative;
   top: 10px;
-  left: 5px;
   width: 3px;
   height: 45px;
   background: #f6e05e;
@@ -54,10 +52,12 @@
 }
 
 .letter {
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
   background-color: #eeeeee;
+  clip-path: polygon(25% 5%, 75% 5%, 100% 50%, 75% 95%, 25% 95%, 0% 50%);
   width: 90px;
   height: 90px;
-  border-radius: 50%;
+
   font-size: 30px;
   font-weight: 600;
   display: flex;
@@ -70,41 +70,42 @@
   position: absolute;
   background-color: #FFD700;
   left: 125px;
-  top: 90px;
+  top: 87px;
 }
 
 #letter0 {
   position: absolute;
-  left: 75px;
+  left: 125px;
 }
 
 #letter1 {
   position: absolute;
-  left: 175px;
+  left: 198px;
+  top: 44px;
 }
 
 #letter2 {
   position: absolute;
-  left: 225px;
-  top: 90px;
+  left: 198px;
+  top: 131px;
 }
 
 #letter3 {
   position: absolute;
-  left: 175px;
-  top: 180px;
+  left: 125px;
+  top: 174px;
 }
 
 #letter4 {
   position: absolute;
-  left: 75px;
-  top: 180px;
+  left: 52px;
+  top: 131px;
 }
 
 #letter5 {
   position: absolute;
-  left: 25px;
-  top: 90px;
+  left: 52px;
+  top: 44px;
 }
 
 .buttons {
@@ -113,13 +114,13 @@
 }
 
 .btn {
-  @apply bg-transparent font-semibold py-2 px-4 border rounded-full;
+  @apply bg-transparent font-light py-2 px-4 border rounded-full;
 }
 
 .refreshButton {
   margin: 0 10px 0 10px;
-  width: 42px;
-  padding: 8px;
+  width: 50px;
+  padding: 12px;
 }
 
 .alert {

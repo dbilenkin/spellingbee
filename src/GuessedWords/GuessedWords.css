@@ -2,14 +2,12 @@
     width: 360px;
     height: 530px;
     position: absolute;
-    top: 80px;
     background: white;
     z-index: 1;
 }
 
 .guessedWordsBox {
     position: absolute;
-    top: 80px;
     display: flex;
     justify-content: start;
     width: 360px;
@@ -17,5 +15,6 @@
 
 .guessedWords {
     width: 360px;
+    margin-right: 10px;
     overflow: hidden;
 }
