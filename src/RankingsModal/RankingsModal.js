@@ -20,11 +20,7 @@ function RankingsModal({ score, rankings, showRankings, setShowRankings }) {
     }, [score, rankings]);
 
     function displayRankingBall(i) {
-        if (i === 8) {
-            return rankingIndex === 8 ? <div className='bg-yellow-400 w-8 h-8 text-xs text-center leading-8'>
-                {score}
-            </div> : <div className='bg-gray-300 w-[8px] h-[8px]'></div>
-        } else if (i === rankingIndex) {
+        if (i === rankingIndex) {
             return (
                 <div className='relative'>
                     <div className='absolute rounded-l-full rounded-r-full top-[-10px] left-[-15px] w-[342px] h-[40px] bg-yellow-400 py-1 text-xs'></div>
@@ -43,7 +39,9 @@ function RankingsModal({ score, rankings, showRankings, setShowRankings }) {
             return (
                 <div key={i} className='z-10 py-2 text-base font-bold mb-2'>
                     {level.label}
-                    <span key={i} className='z-10 py-1 pl-2 text-xs mb-2 font-normal'>{reversedRankings[i-1] - score} points to {reversedLevels[i-1].label}</span>
+                    <span key={i} className='z-10 py-1 pl-2 text-xs mb-2 font-normal'>
+                        {i !== 0 ? `${reversedRankings[i - 1] - score} points to ${reversedLevels[i - 1].label}` : 'You got Genius!'}
+                    </span>
                 </div>
 
             )

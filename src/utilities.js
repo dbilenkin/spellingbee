@@ -1,5 +1,5 @@
 export function isPangram(word) {
-    const letterSet = new Set(word.split(""));
+    const letterSet = new Set(word.toLowerCase().split(""));
     return letterSet.size === 7;
 }
 

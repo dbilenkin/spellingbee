@@ -6,12 +6,14 @@ import RankingsModal from './RankingsModal/RankingsModal';
 import GuessedWords from './GuessedWords/GuessedWords';
 import { isPangram } from './utilities';
 import Answers from './Answers/Answers';
+import GeniusModal from './GeniusModal/GeniusModal';
 
 function App() {
   const [special, setSpecial] = useState("");
   const [letters, setLetters] = useState([]);
   const [words, setWords] = useState([]);
   const [rankings, setRankings] = useState([]);
+  const [gameId, setGameId] = useState(0);
 
   const [guess, setGuess] = useState("");
   const [guessedWords, setGuessedWords] = useState([]);
@@ -20,10 +22,14 @@ function App() {
 
   const [showRankings, setShowRankings] = useState(false);
   const [showAnswers, setShowAnswers] = useState(false);
+  const [showGenius, setShowGenius] = useState(false);
 
   useEffect(() => {
-    if (localStorage.special) {
-      getFromStorage();
+    let gameIdFromPath = parseInt(window.location.pathname.split("/")[2]);
+    let gameIdFromStorage = parseInt(localStorage.gameId);
+
+    if (gameIdFromPath && gameIdFromPath === gameIdFromStorage) {
+      getFromStorage()
     } else {
       initNewGame();
     }
@@ -31,13 +37,13 @@ function App() {
 
   function initNewGame() {
 
-    let gameId = parseInt(window.location.pathname.split("/")[2]);
-    if (!gameId) {
-      gameId = Math.floor(Math.random() * spellingBeeWords.length);
-      window.history.replaceState(null, "", "/spellingbee/" + gameId);
+    let _gameId = parseInt(window.location.pathname.split("/")[2]);
+    if (!_gameId) {
+      _gameId = Math.floor(Math.random() * spellingBeeWords.length);
+      window.history.replaceState(null, "", "/spellingbee/" + _gameId);
     }
 
-    const game = spellingBeeWords[gameId];
+    const game = spellingBeeWords[_gameId];
 
     const _special = game.special;
     const _letters = game.letters.split("").filter(letter => letter !== _special);
@@ -48,13 +54,14 @@ function App() {
     setLetters(_letters);
     setWords(_words);
     setRankings(_rankings);
+    setGameId(_gameId)
 
     setScore(0);
     setGuess("");
     setGuessedWords([]);
     setAlert("");
 
-    saveToStorage(_special, _letters, _words, _rankings);
+    saveToStorage(_special, _letters, _words, _rankings, _gameId);
   }
 
   function getFromStorage() {
@@ -62,6 +69,7 @@ function App() {
     setLetters(JSON.parse(localStorage.letters));
     setWords(JSON.parse(localStorage.words));
     setRankings(JSON.parse(localStorage.rankings));
+    setGameId(parseInt(localStorage.gameId));
     setScore(parseInt(localStorage.score));
 
     if (localStorage.guessedWords) {
@@ -69,11 +77,12 @@ function App() {
     }
   }
 
-  function saveToStorage(special, letters, words, rankings) {
+  function saveToStorage(special, letters, words, rankings, gameId) {
     localStorage.special = special;
     localStorage.letters = JSON.stringify(letters);
     localStorage.words = JSON.stringify(words);
     localStorage.rankings = JSON.stringify(rankings);
+    localStorage.gameId = gameId;
   }
 
   function newGame() {
@@ -82,7 +91,9 @@ function App() {
     localStorage.removeItem("words");
     localStorage.removeItem("guessedWords");
     localStorage.removeItem("score");
+    localStorage.removeItem("gameId");
 
+    window.history.replaceState(null, "", "/spellingbee");
     initNewGame();
   }
 
@@ -139,18 +150,22 @@ function App() {
       setScore(newScore);
       localStorage.score = newScore;
 
-      if (scoreForWord === 1) {
-        setAlert("Good! +" + scoreForWord);
-      } else if (scoreForWord < 7) {
-        setAlert("Nice! +" + scoreForWord);
-      } else {
-        if (pangram) {
-          setAlert("Pangram! +" + scoreForWord);
+      const geniusScore = rankings[rankings.length - 2];
+      if (score < geniusScore && newScore >= geniusScore) {
+        setShowGenius(true);
+      } else{
+        if (scoreForWord === 1) {
+          setAlert("Good! +" + scoreForWord);
+        } else if (scoreForWord < 7) {
+          setAlert("Nice! +" + scoreForWord);
         } else {
-          setAlert("Awesome! +" + scoreForWord);
+          if (pangram) {
+            setAlert("Pangram! +" + scoreForWord);
+          } else {
+            setAlert("Awesome! +" + scoreForWord);
+          }
         }
       }
-
 
       newGuessedWords.unshift(formatGuess(guess));
       setGuessedWords(newGuessedWords);
@@ -176,10 +191,11 @@ function App() {
         </div>
       </header>
       <div className='content'>
+        <GeniusModal score={score} guessedWords={guessedWords} showGenius={showGenius} setShowGenius={setShowGenius} newGame={newGame}/>
         <RankingsModal score={score} rankings={rankings} showRankings={showRankings} setShowRankings={setShowRankings} />
         <Answers guessedWords={guessedWords} words={words} special={special} letters={letters} showAnswers={showAnswers} setShowAnswers={setShowAnswers} />
         <Rankings score={score} rankings={rankings} />
-        <GuessedWords guessedWords={guessedWords} letters={letters} />
+        <GuessedWords guessedWords={guessedWords} />
         <div className={`rounded justify-self-center h-8 py-1 px-2 mt-[60px] bg-black text-white alert ${alert ? 'show' : ''} ${alert.indexOf('!') !== -1 ? 'nice' : ''}`}>{alert}</div>
         <div className="guess">{renderGuess()}</div>
         <div className="letters">

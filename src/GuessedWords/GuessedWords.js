@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import './GuessedWords.css';
 import { isPangram } from '../utilities';
 
-function GuessedWords({ guessedWords, letters }) {
+function GuessedWords({ guessedWords }) {
 
     const [collapsed, setCollapsed] = useState(true);
 
     function displayWord(word, i) {
-        return <div key={i} className={`border-b border-gray-300 m-2 ${isPangram(word, letters) ? 'font-bold' : ''}`}>{word}</div>
+        return <div key={i} className={`border-b border-gray-300 m-2 ${isPangram(word) ? 'font-bold' : ''}`}>{word}</div>
     }
 
     function displayOpenWords() {
@@ -25,7 +25,7 @@ function GuessedWords({ guessedWords, letters }) {
         <div className='relative m-auto w-[360px]'>
             {collapsed ? <div className='rounded justify-self-center border h-10 p-2 guessedWordsBox'>
                 <span className='guessedWords'>{guessedWords.map(word => (
-                    <span key={word} className={`mr-1 ${isPangram(word, letters) ? 'font-bold' : ''}`}>{word}</span>
+                    <span key={word} className={`mr-1 ${isPangram(word) ? 'font-bold' : ''}`}>{word}</span>
                 ))}</span>
                 <div className='cursor-pointer' onClick={() => setCollapsed(false)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">

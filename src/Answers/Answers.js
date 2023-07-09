@@ -46,7 +46,7 @@ function Answers({ guessedWords, words, special, letters, showAnswers, setShowAn
                         Answers
                         <span className='text-xl mx-8 font-bold'>
                             <span className='text-yellow-400'>{special.toUpperCase()}</span>
-                            {letters.map(letter => <span className='pl-2'>{letter.toUpperCase()}</span>)}
+                            {letters.map(letter => <span key={letter} className='pl-2'>{letter.toUpperCase()}</span>)}
                         </span>
                     </div>
 

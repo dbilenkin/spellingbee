@@ -1,6 +1,4 @@
-
-
-.answersModal {
+.geniusModal {
     visibility: hidden;
     position: relative;
     background: white;
@@ -12,4 +10,9 @@
 
 .show {
     visibility: visible;
+}
+
+.btn-black {
+    color: white;
+    background-color: black;
 }
