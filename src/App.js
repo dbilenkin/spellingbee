@@ -25,8 +25,10 @@ function App() {
   const [showGenius, setShowGenius] = useState(false);
 
   useEffect(() => {
-    let gameIdFromPath = parseInt(window.location.pathname.split("/")[2]);
     let gameIdFromStorage = parseInt(localStorage.gameId);
+
+    let params = new URL(document.location).searchParams;
+    let gameIdFromPath = parseInt(params.get("gameId"));
 
     if (gameIdFromPath && gameIdFromPath === gameIdFromStorage) {
       getFromStorage()
@@ -37,10 +39,11 @@ function App() {
 
   function initNewGame() {
 
-    let _gameId = parseInt(window.location.pathname.split("/")[2]);
+    let params = new URL(document.location).searchParams;
+    let _gameId = parseInt(params.get("gameId"));
     if (!_gameId) {
       _gameId = Math.floor(Math.random() * spellingBeeWords.length);
-      window.history.replaceState(null, "", "/spellingbee/" + _gameId);
+      window.history.replaceState(null, "", "/spellingbee?gameId=" + _gameId);
     }
 
     const game = spellingBeeWords[_gameId];
@@ -153,7 +156,7 @@ function App() {
       const geniusScore = rankings[rankings.length - 2];
       if (score < geniusScore && newScore >= geniusScore) {
         setShowGenius(true);
-      } else{
+      } else {
         if (scoreForWord === 1) {
           setAlert("Good! +" + scoreForWord);
         } else if (scoreForWord < 7) {
@@ -191,7 +194,7 @@ function App() {
         </div>
       </header>
       <div className='content'>
-        <GeniusModal score={score} guessedWords={guessedWords} showGenius={showGenius} setShowGenius={setShowGenius} newGame={newGame}/>
+        <GeniusModal score={score} guessedWords={guessedWords} showGenius={showGenius} setShowGenius={setShowGenius} newGame={newGame} />
         <RankingsModal score={score} rankings={rankings} showRankings={showRankings} setShowRankings={setShowRankings} />
         <Answers guessedWords={guessedWords} words={words} special={special} letters={letters} showAnswers={showAnswers} setShowAnswers={setShowAnswers} />
         <Rankings score={score} rankings={rankings} />
